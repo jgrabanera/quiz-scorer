@@ -1,39 +1,74 @@
 import Dropdown from "@/Components/Dropdown";
 import GreenButton from "@/Components/GreenButton";
+import NextQButton from "@/Components/NextQButton";
 import RedButton from "@/Components/RedButton";
-import ToggleBox from "@/Components/ToggleBox";
+import axios from "axios";
+import { useEffect, useState } from "react";
 
 const score = () => {
-    const tblStudent = [];
+    const [tblStudent, setTblStudent] = useState([]);
+    const [qNumber, setqNumber] = useState();
+    const [level, setLevel] = useState();
+
+    useEffect(() => {
+        axios
+            .get("/get-student-info")
+            .then((response) => {
+                setTblStudent(response.data);
+            })
+            .catch((error) => {
+                console.error("Error fetching data:", error);
+            });
+        axios
+            .get("/get-current-question-number")
+            .then((response) => {
+                setqNumber(response.data.number);
+                setLevel(response.data.current_point);
+                //console.log(response.data.number);
+            })
+            .catch((error) => {
+                console.error("Error fetching data:", error);
+            });
+    }, []);
 
     return (
         <div>
             <div className="p-2">
                 <h1 className="w-full bg-blue-200 p-3 text-3xl text-center font-bold">
-                    Question #1
+                    Question no. {qNumber}
                 </h1>
                 <br />
                 <div className="flex flex-row justify-between items-center ">
-                    <Dropdown items={["Easy", "Average", "Difficult"]} />
-                    <GreenButton name={"Next Question"} />
+                    <Dropdown
+                        level={level}
+                        items={["Easy", "Average", "Difficult"]}
+                    />
+                    <NextQButton
+                        qNumber={qNumber}
+                        setqNumber={setqNumber}
+                        name={"Next Question"}
+                    />
                 </div>
                 <br />
 
                 <table className="w-full">
                     <tbody>
-                        {tblStudent.map((student) => (
+                        {tblStudent.map((student, index) => (
                             <tr
                                 key={student.id}
                                 className="flex justify-center items-center border-b-2 py-2"
                             >
-                                <td className="font-bold max-w-[200px] w-full text-sm">
+                                <td className="font-bold max-w-[300px] w-full text-sm">
                                     <span className="font-normal text-xs">
-                                        {student.id}.{" "}
+                                        {index + 1}.{" "}
                                     </span>
                                     {student.name}
                                 </td>
                                 <td>
-                                    <GreenButton name={"Correct"} />
+                                    <GreenButton
+                                        name={"Correct"}
+                                        onClick={() => handleCorrect}
+                                    />
                                 </td>
                                 <td>
                                     <RedButton name={"Wrong"} />

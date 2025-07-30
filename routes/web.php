@@ -29,8 +29,12 @@ Route::get('/', function () {
 Route::get('/score', function () {
     return Inertia::render('Score');
 });
+Route::get('/get-student-info', [App\Http\Controllers\ScoreController::class, 'getStudentInfo']);
+Route::get('/get-current-question-number', [App\Http\Controllers\ScoreController::class, 'getCurrentQuestionNumber']);
+Route::post('/update-current-question-number', [App\Http\Controllers\ScoreController::class, 'updateCurrentQuestionNumber']);
+Route::post('/update-level', [App\Http\Controllers\ScoreController::class, 'updateLevel']);
+Route::post('/update-student-score', [App\Http\Controllers\ScoreController::class, 'updateStudentScore']);
 
-Route::get('/score', [App\Http\Controllers\ScoreController::class, 'index']);
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
