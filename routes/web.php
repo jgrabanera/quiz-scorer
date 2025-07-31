@@ -7,15 +7,15 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 /*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
-|
-*/
+ * |--------------------------------------------------------------------------
+ * | Web Routes
+ * |--------------------------------------------------------------------------
+ * |
+ * | Here is where you can register web routes for your application. These
+ * | routes are loaded by the RouteServiceProvider within a group which
+ * | contains the "web" middleware group. Now create something great!
+ * |
+ */
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -31,10 +31,10 @@ Route::get('/score', function () {
 });
 Route::get('/get-student-info', [App\Http\Controllers\ScoreController::class, 'getStudentInfo']);
 Route::get('/get-current-question-number', [App\Http\Controllers\ScoreController::class, 'getCurrentQuestionNumber']);
+Route::post('/insert-student-score', [App\Http\Controllers\ScoreController::class, 'insertStudentScore']);
 Route::post('/update-current-question-number', [App\Http\Controllers\ScoreController::class, 'updateCurrentQuestionNumber']);
 Route::post('/update-level', [App\Http\Controllers\ScoreController::class, 'updateLevel']);
 Route::post('/update-student-score', [App\Http\Controllers\ScoreController::class, 'updateStudentScore']);
-
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
@@ -46,4 +46,4 @@ Route::middleware('auth')->group(function () {
     // Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

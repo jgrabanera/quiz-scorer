@@ -1,23 +1,47 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Models\StudentInfo;
+
 use App\Models\CurrentQuestion;
-use Inertia\Inertia;
+use App\Models\SemiScore;
+use App\Models\StudentInfo;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class ScoreController extends Controller
 {
     //
     public function index()
     {
-        return  Inertia::render('Score');
+        return Inertia::render('Score');
     }
 
-     public function getStudentInfo()
+    public function getStudentInfo()
     {
         return StudentInfo::select('id', 'name', 'school', 'province')->get();
     }
+
+    public function insertStudentScore(Request $request)
+    {
+        return $request;
+        $data = $request->validate([
+            'name' => 'required|string|max:255',
+            'school' => 'required|string|max:255',
+            'province' => 'required|string|max:255',
+        ]);
+
+        $student = SemiScore::create([
+            'name' => $data['name'],
+            'current_point' => $score->current_point,
+            'number' => $score->number,
+        ]);
+
+        return response()->json([
+            'message' => 'Student score inserted successfully.',
+            'student' => $student
+        ]);
+    }
+
     public function updateStudentScore(Request $request)
     {
         $data = $request->validate([
@@ -35,13 +59,12 @@ class ScoreController extends Controller
 
     public function updateLevel(Request $request)
     {
-       // return $request;
-         $request->validate([
+        // return $request;
+        $request->validate([
             'level' => 'required',
         ]);
 
-
-        CurrentQuestion::where('id',1)->update([
+        CurrentQuestion::where('id', 1)->update([
             'current_point' => $request->level
         ]);
 
@@ -53,18 +76,17 @@ class ScoreController extends Controller
 
     public function getCurrentQuestionNumber()
     {
-        return CurrentQuestion::where('id',1)->first();
-
+        return CurrentQuestion::where('id', 1)->first();
     }
 
-       public function updateCurrentQuestionNumber(Request $request)
+    public function updateCurrentQuestionNumber(Request $request)
     {
-        //return $request;
-         $request->validate([
+        // return $request;
+        $request->validate([
             'number' => 'required|integer|min:1',
         ]);
 
-        CurrentQuestion::where('id',1)->update([
+        CurrentQuestion::where('id', 1)->update([
             'number' => $request->number
         ]);
 
@@ -72,6 +94,5 @@ class ScoreController extends Controller
             'message' => 'Question number updated successfully.',
             'number' => $request->number
         ]);
-
     }
 }

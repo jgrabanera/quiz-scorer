@@ -60,7 +60,11 @@ const score = () => {
                 </h1>
                 <br />
                 <div className="flex flex-row justify-between items-center ">
-                    <Dropdown level={level} items={dropDownItems} />
+                    <Dropdown
+                        level={level}
+                        setLevel={setLevel}
+                        items={dropDownItems}
+                    />
                     <ResetToZero
                         qNumber={qNumber}
                         setqNumber={setqNumber}
@@ -89,6 +93,9 @@ const score = () => {
                                 </td>
                                 <td>
                                     <GreenButton
+                                        student={student.name}
+                                        level={level}
+                                        qNumber={qNumber}
                                         name={"Correct"}
                                         onClick={() => handleCorrect}
                                     />
