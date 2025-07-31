@@ -2,13 +2,29 @@ import Dropdown from "@/Components/Dropdown";
 import GreenButton from "@/Components/GreenButton";
 import NextQButton from "@/Components/NextQButton";
 import RedButton from "@/Components/RedButton";
+import ResetToZero from "@/Components/ResetToZero";
 import axios from "axios";
 import { useEffect, useState } from "react";
 
 const score = () => {
     const [tblStudent, setTblStudent] = useState([]);
     const [qNumber, setqNumber] = useState();
-    const [level, setLevel] = useState();
+    const [level, setLevel] = useState(0);
+
+    const dropDownItems = [
+        {
+            score: 1,
+            label: "Easy",
+        },
+        {
+            score: 3,
+            label: "Average",
+        },
+        {
+            score: 5,
+            label: "Difficult",
+        },
+    ];
 
     useEffect(() => {
         axios
@@ -22,14 +38,19 @@ const score = () => {
         axios
             .get("/get-current-question-number")
             .then((response) => {
+                console.log(response.data);
+
                 setqNumber(response.data.number);
                 setLevel(response.data.current_point);
-                //console.log(response.data.number);
             })
             .catch((error) => {
                 console.error("Error fetching data:", error);
             });
     }, []);
+
+    useEffect(() => {
+        console.log("Level: ", level);
+    }, [level]);
 
     return (
         <div>
@@ -39,9 +60,11 @@ const score = () => {
                 </h1>
                 <br />
                 <div className="flex flex-row justify-between items-center ">
-                    <Dropdown
-                        level={level}
-                        items={["Easy", "Average", "Difficult"]}
+                    <Dropdown level={level} items={dropDownItems} />
+                    <ResetToZero
+                        qNumber={qNumber}
+                        setqNumber={setqNumber}
+                        name={"Reset Questions"}
                     />
                     <NextQButton
                         qNumber={qNumber}

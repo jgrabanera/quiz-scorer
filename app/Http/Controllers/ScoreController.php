@@ -35,34 +35,43 @@ class ScoreController extends Controller
 
     public function updateLevel(Request $request)
     {
+       // return $request;
          $request->validate([
-            'level' => 'required|string|in:Easy,Average,Difficult',
+            'level' => 'required',
         ]);
 
 
         CurrentQuestion::where('id',1)->update([
-            'current_point' => $request->level === 'Easy' ? 1 : ( $request->level === 'Average' ? 3 : 5),
+            'current_point' => $request->level
         ]);
 
-        return response()->json(['message' => 'Level updated successfully.']);
+        return response()->json([
+            'message' => 'Level updated successfully.',
+            'level' => $request->level
+        ]);
     }
 
     public function getCurrentQuestionNumber()
     {
-        return CurrentQuestion::where('id',1)->First();
+        return CurrentQuestion::where('id',1)->first();
 
     }
+
        public function updateCurrentQuestionNumber(Request $request)
     {
-        $data = $request->validate([
+        //return $request;
+         $request->validate([
             'number' => 'required|integer|min:1',
         ]);
 
         CurrentQuestion::where('id',1)->update([
-            'number' => $data['number'],
+            'number' => $request->number
         ]);
 
-        return response()->json(['message' => 'Question number updated successfully.']);
+        return response()->json([
+            'message' => 'Question number updated successfully.',
+            'number' => $request->number
+        ]);
 
     }
 }
