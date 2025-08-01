@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-const Dropdown = ({ items, level, setLevel }) => {
+const Dropdown = ({ items, level, setLevel, setqNumber }) => {
     const [levelValue, setLevelValue] = useState(level);
     //console.log(level);
     const selectLevel = (e) => {
@@ -10,7 +10,8 @@ const Dropdown = ({ items, level, setLevel }) => {
             .post("/update-level", formData)
             .then((response) => {
                 setLevelValue(response.data.level);
-                setLevel(level);
+                setLevel(response.data.level);
+                setqNumber(1);
                 console.log(response.data);
             })
             .catch((error) => {

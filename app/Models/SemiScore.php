@@ -13,8 +13,9 @@ class SemiScore extends Model
     protected $primaryKey = 'id';
 
     protected $fillable = [
-        'number',
+        'name',
         'question',
         'score',
+'save',
     ];
 }

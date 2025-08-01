@@ -23,22 +23,24 @@ class ScoreController extends Controller
 
     public function insertStudentScore(Request $request)
     {
-        return $request;
+        // return $request;
         $data = $request->validate([
             'name' => 'required|string|max:255',
-            'school' => 'required|string|max:255',
-            'province' => 'required|string|max:255',
+            'question' => 'required|integer|min:1',
+            'score' => 'required|integer|min:1',
+            'save' => 'required|boolean',
         ]);
 
-        $student = SemiScore::create([
-            'name' => $data['name'],
-            'current_point' => $score->current_point,
-            'number' => $score->number,
+        SemiScore::create([
+            'name' => $request->name,
+            'question' => $request->question,
+            'score' => $request->score,
+            'save' => $request->save,
         ]);
 
         return response()->json([
             'message' => 'Student score inserted successfully.',
-            'student' => $student
+            'data' => $data,
         ]);
     }
 

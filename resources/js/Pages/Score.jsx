@@ -18,7 +18,7 @@ const score = () => {
                 name: student.name,
                 question: qNumber,
                 score: level,
-                save: true,
+                save: true, // Assuming 'save' is a boolean to indicate if the score is saved
             })
             .then((response) => {
                 console.log(response.data);
@@ -78,15 +78,21 @@ const score = () => {
                 <br />
                 <div className="flex flex-row justify-between items-center ">
                     <Dropdown
+                        qNumber={qNumber}
+                        setqNumber={setqNumber}
                         level={level}
                         setLevel={setLevel}
                         items={dropDownItems}
                     />
-                    <ResetToZero
+                    <select className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 max-w-[130px] w-full">
+                        <option>Semi Finals</option>
+                        <option>Finals</option>
+                    </select>
+                    {/* <ResetToZero
                         qNumber={qNumber}
                         setqNumber={setqNumber}
                         name={"Reset Q"}
-                    />
+                    /> */}
                     <NextQButton
                         qNumber={qNumber}
                         setqNumber={setqNumber}
@@ -104,7 +110,7 @@ const score = () => {
                                 className="bg-gray-200 hover:bg-green-300 text-center p-4 rounded shadow transition duration-200"
                             >
                                 <span className="font-bold">{student.id}</span>
-                                <span className="text-xs line-clamp-2">
+                                <span className="text-xs line-clamp-2 capitalize">
                                     {student.name}
                                 </span>
                             </div>
