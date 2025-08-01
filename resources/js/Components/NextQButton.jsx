@@ -9,7 +9,7 @@ const NextQButton = ({ name, qNumber, setqNumber }) => {
             .then((response) => {
                 setqNumber(qNumber + 1);
 
-                console.log(response.data);
+                console.log(response.data.number);
             })
             .catch((error) => {
                 console.error("Error updating question number:", error);

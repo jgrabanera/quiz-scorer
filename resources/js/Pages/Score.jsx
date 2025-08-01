@@ -1,5 +1,6 @@
 import Dropdown from "@/Components/Dropdown";
 import GreenButton from "@/Components/GreenButton";
+import Grid from "@/Components/Grid";
 import NextQButton from "@/Components/NextQButton";
 import RedButton from "@/Components/RedButton";
 import ResetToZero from "@/Components/ResetToZero";
@@ -10,6 +11,22 @@ const score = () => {
     const [tblStudent, setTblStudent] = useState([]);
     const [qNumber, setqNumber] = useState();
     const [level, setLevel] = useState(0);
+
+    const handleClick = (student) => {
+        axios
+            .post("/insert-student-score", {
+                name: student.name,
+                question: qNumber,
+                score: level,
+                save: true,
+            })
+            .then((response) => {
+                console.log(response.data);
+            })
+            .catch((error) => {
+                console.error("Error creating user:", error);
+            });
+    };
 
     const dropDownItems = [
         {
@@ -68,45 +85,33 @@ const score = () => {
                     <ResetToZero
                         qNumber={qNumber}
                         setqNumber={setqNumber}
-                        name={"Reset Questions"}
+                        name={"Reset Q"}
                     />
                     <NextQButton
                         qNumber={qNumber}
                         setqNumber={setqNumber}
-                        name={"Next Question"}
+                        name={"Next Q"}
                     />
                 </div>
                 <br />
-
-                <table className="w-full">
-                    <tbody>
+                <div className=""></div>
+                <div className="">
+                    <div className="grid grid-cols-3 sm:grid-cols-2 md:grid-cols-6 lg:grid-cols-10 gap-2">
                         {tblStudent.map((student, index) => (
-                            <tr
-                                key={student.id}
-                                className="flex justify-center items-center border-b-2 py-2"
+                            <div
+                                key={index}
+                                onClick={() => handleClick(student)}
+                                className="bg-gray-200 hover:bg-green-300 text-center p-4 rounded shadow transition duration-200"
                             >
-                                <td className="font-bold max-w-[300px] w-full text-sm">
-                                    <span className="font-normal text-xs">
-                                        {index + 1}.{" "}
-                                    </span>
+                                <span className="font-bold">{student.id}</span>
+                                <span className="text-xs line-clamp-2">
                                     {student.name}
-                                </td>
-                                <td>
-                                    <GreenButton
-                                        student={student.name}
-                                        level={level}
-                                        qNumber={qNumber}
-                                        name={"Correct"}
-                                        onClick={() => handleCorrect}
-                                    />
-                                </td>
-                                <td>
-                                    <RedButton name={"Wrong"} />
-                                </td>
-                            </tr>
+                                </span>
+                            </div>
                         ))}
-                    </tbody>
-                </table>
+                    </div>
+                </div>
+                {/* table */}
             </div>
         </div>
     );
