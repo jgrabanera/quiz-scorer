@@ -10,7 +10,7 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('tbl_score_semi', function (Blueprint $table) {
+        Schema::create('tbl_score_finals', function (Blueprint $table) {
             $table->id();
             $table->text('name');
             $table->text('level');
@@ -25,6 +25,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('tbl_score_semi');
+        Schema::dropIfExists('tbl_score_finals');
     }
 };
