@@ -22,6 +22,16 @@ class ScoreController extends Controller
         return StudentInfo::select('id', 'name', 'school', 'province')->get();
     }
 
+    public function getFinalStudentInfo()
+    {
+        return FinalScore::select('id', 'name', 'score')->get();
+    }
+
+    public function getSemiStudentInfo()
+    {
+        return SemiScore::select('id', 'name', 'school')->get();
+    }
+
     public function insertStudentSemiScore(Request $request)
     {
         // return $request;
