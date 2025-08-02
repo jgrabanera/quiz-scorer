@@ -76,6 +76,23 @@ class ScoreController extends Controller
         ]);
     }
 
+    public function updatePlayoff(Request $request)
+    {
+        // return $request;
+        $request->validate([
+            'playoff' => 'required',
+        ]);
+
+        CurrentQuestion::where('id', 1)->update([
+            'current_playoff' => $request->playoff
+        ]);
+
+        return response()->json([
+            'message' => 'Level updated successfully.',
+            'playoff' => $request->playoff
+        ]);
+    }
+
     public function getCurrentQuestionNumber()
     {
         return CurrentQuestion::where('id', 1)->first();

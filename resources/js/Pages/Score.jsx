@@ -1,9 +1,6 @@
 import Dropdown from "@/Components/Dropdown";
-import GreenButton from "@/Components/GreenButton";
-import Grid from "@/Components/Grid";
 import NextQButton from "@/Components/NextQButton";
-import RedButton from "@/Components/RedButton";
-import ResetToZero from "@/Components/ResetToZero";
+import Playoff from "@/Components/Playoff";
 import axios from "axios";
 import { useEffect, useState } from "react";
 
@@ -11,10 +8,11 @@ const score = () => {
     const [tblStudent, setTblStudent] = useState([]);
     const [qNumber, setqNumber] = useState();
     const [level, setLevel] = useState(0);
+    const [playoff, setPlayoff] = useState(0);
 
     const handleClick = (student) => {
         axios
-            .post("/insert-student-score", {
+            .post("/insert-student-semiscore", {
                 name: student.name,
                 question: qNumber,
                 score: level,
@@ -27,6 +25,17 @@ const score = () => {
                 console.error("Error creating user:", error);
             });
     };
+
+    const playoffItems = [
+        {
+            value: 0,
+            label: "Semi Finals",
+        },
+        {
+            value: 1,
+            label: "Finals",
+        },
+    ];
 
     const dropDownItems = [
         {
@@ -56,7 +65,7 @@ const score = () => {
             .get("/get-current-question-number")
             .then((response) => {
                 console.log(response.data);
-
+                setPlayoff(response.data.current_playoff);
                 setqNumber(response.data.number);
                 setLevel(response.data.current_point);
             })
@@ -64,10 +73,6 @@ const score = () => {
                 console.error("Error fetching data:", error);
             });
     }, []);
-
-    useEffect(() => {
-        console.log("Level: ", level);
-    }, [level]);
 
     return (
         <div>
@@ -84,10 +89,12 @@ const score = () => {
                         setLevel={setLevel}
                         items={dropDownItems}
                     />
-                    <select className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 max-w-[130px] w-full">
-                        <option>Semi Finals</option>
-                        <option>Finals</option>
-                    </select>
+                    <Playoff
+                        playoff={playoff}
+                        setPlayoff={setPlayoff}
+                        items={playoffItems}
+                    />
+
                     {/* <ResetToZero
                         qNumber={qNumber}
                         setqNumber={setqNumber}
