@@ -1,17 +1,23 @@
 import { useState } from "react";
 import { FaCircleCheck } from "react-icons/fa6";
 
-const GreenButton = ({ name, student, level, qNumber }) => {
+const GreenButton = ({ name, student, level, qNumber, playoff }) => {
     const [save, setSave] = useState(false);
     function handleCorrect() {
         axios
-            .post("/insert-student-score", {
-                name: student,
-                question: qNumber,
-                score: level,
-            })
+            .post(
+                playoff == 0
+                    ? "/insert-student-semiscore"
+                    : "/insert-student-finalscore",
+                {
+                    name: student,
+                    question: qNumber,
+                    score: level,
+                }
+            )
             .then((response) => {
                 console.log(response.data);
+                console.log(playoff);
                 setSave(true);
             })
             .catch((error) => {

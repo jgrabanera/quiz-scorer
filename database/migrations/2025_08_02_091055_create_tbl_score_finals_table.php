@@ -13,9 +13,9 @@ return new class extends Migration {
         Schema::create('tbl_score_finals', function (Blueprint $table) {
             $table->id();
             $table->text('name');
-            $table->text('level');
             $table->text('question');
             $table->text('score');
+            $table->int('save');
             $table->timestamps();
         });
     }

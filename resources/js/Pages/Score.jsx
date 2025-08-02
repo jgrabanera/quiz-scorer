@@ -1,5 +1,6 @@
 import Dropdown from "@/Components/Dropdown";
 import NextQButton from "@/Components/NextQButton";
+import ResetToZero from "@/Components/ResetToZero";
 import Playoff from "@/Components/Playoff";
 import axios from "axios";
 import { useEffect, useState } from "react";
@@ -12,12 +13,17 @@ const score = () => {
 
     const handleClick = (student) => {
         axios
-            .post("/insert-student-semiscore", {
-                name: student.name,
-                question: qNumber,
-                score: level,
-                save: true, // Assuming 'save' is a boolean to indicate if the score is saved
-            })
+            .post(
+                playoff == 0
+                    ? "/insert-student-semiscore"
+                    : "/insert-student-finalscore",
+                {
+                    name: student.name,
+                    question: qNumber,
+                    score: level,
+                    save: true, // Assuming 'save' is a boolean to indicate if the score is saved
+                }
+            )
             .then((response) => {
                 console.log(response.data);
             })
@@ -64,7 +70,20 @@ const score = () => {
         axios
             .get("/get-current-question-number")
             .then((response) => {
-                console.log(response.data);
+                console.log(
+                    "Question Number:",
+                    response.data.number,
+                    ", Playoff:",
+                    response.data.current_playoff == 0
+                        ? "Semi Finals"
+                        : "Finals,",
+                    "Point:",
+                    response.data.current_point == 1
+                        ? "Easy || 1"
+                        : response.data.current_point == 3
+                        ? "Average || 3"
+                        : "Difficult || 5"
+                );
                 setPlayoff(response.data.current_playoff);
                 setqNumber(response.data.number);
                 setLevel(response.data.current_point);
@@ -77,9 +96,16 @@ const score = () => {
     return (
         <div>
             <div className="p-2">
-                <h1 className="w-full bg-blue-200 p-3 text-3xl text-center font-bold">
-                    Question no. {qNumber}
-                </h1>
+                <div className="w-full bg-blue-200 p-3 text-3xl text-center font-bold flex justify-center items-center  gap-2">
+                    <ResetToZero
+                        qNumber={qNumber}
+                        setqNumber={setqNumber}
+                        name={"Reset Q"}
+                    />
+
+                    <h1>Question no. {qNumber}</h1>
+                </div>
+
                 <br />
                 <div className="flex flex-row justify-between items-center ">
                     <Dropdown
@@ -95,11 +121,6 @@ const score = () => {
                         items={playoffItems}
                     />
 
-                    {/* <ResetToZero
-                        qNumber={qNumber}
-                        setqNumber={setqNumber}
-                        name={"Reset Q"}
-                    /> */}
                     <NextQButton
                         qNumber={qNumber}
                         setqNumber={setqNumber}
@@ -107,14 +128,13 @@ const score = () => {
                     />
                 </div>
                 <br />
-                <div className=""></div>
                 <div className="">
                     <div className="grid grid-cols-3 sm:grid-cols-2 md:grid-cols-6 lg:grid-cols-10 gap-2">
                         {tblStudent.map((student, index) => (
                             <div
                                 key={index}
                                 onClick={() => handleClick(student)}
-                                className="bg-gray-200 hover:bg-green-300 text-center p-4 rounded shadow transition duration-200"
+                                className="bg-gray-200 hover:bg-green-300 text-center p-4 rounded shadow"
                             >
                                 <span className="font-bold">{student.id}</span>
                                 <span className="text-xs line-clamp-2 capitalize">

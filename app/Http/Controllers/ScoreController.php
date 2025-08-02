@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\CurrentQuestion;
+use App\Models\FinalScore;
 use App\Models\SemiScore;
 use App\Models\StudentInfo;
 use Illuminate\Http\Request;
@@ -21,7 +22,7 @@ class ScoreController extends Controller
         return StudentInfo::select('id', 'name', 'school', 'province')->get();
     }
 
-    public function insertStudentScore(Request $request)
+    public function insertStudentSemiScore(Request $request)
     {
         // return $request;
         $data = $request->validate([
@@ -40,6 +41,29 @@ class ScoreController extends Controller
 
         return response()->json([
             'message' => 'Student score inserted successfully.',
+            'data' => $data,
+        ]);
+    }
+
+    public function insertStudentFinalScore(Request $request)
+    {
+        // return $request;
+        $data = $request->validate([
+            'name' => 'required|string|max:255',
+            'question' => 'required|integer|min:1',
+            'score' => 'required|integer|min:1',
+            'save' => 'required|boolean',
+        ]);
+
+        FinalScore::create([
+            'name' => $request->name,
+            'question' => $request->question,
+            'score' => $request->score,
+            'save' => $request->save,
+        ]);
+
+        return response()->json([
+            'message' => 'Finals score inserted successfully.',
             'data' => $data,
         ]);
     }

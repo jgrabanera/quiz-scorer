@@ -10,7 +10,9 @@ const Playoff = ({ playoff, setPlayoff, items }) => {
             .then((response) => {
                 setPlayoffValue(response.data.playoff);
                 setPlayoff(response.data.playoff);
-                console.log(response.data.playoff);
+                console.log(
+                    response.data.playoff == 0 ? "Semi Finals" : "Finals"
+                );
             })
             .catch((error) => {
                 console.error("Error creating user:", error);

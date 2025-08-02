@@ -16,6 +16,6 @@ class SemiScore extends Model
         'name',
         'question',
         'score',
-'save',
+        'save',
     ];
 }
