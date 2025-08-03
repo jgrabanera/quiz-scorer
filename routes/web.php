@@ -31,6 +31,7 @@ Route::get('/score', function () {
 });
 Route::get('/get-student-info', [App\Http\Controllers\ScoreController::class, 'getStudentInfo']);
 Route::get('/get-student-final', [App\Http\Controllers\ScoreController::class, 'getFinalStudentInfo']);
+Route::get('/get-final-score', [App\Http\Controllers\ScoreController::class, 'getFinalScore']);
 Route::get('/get-student-semi', [App\Http\Controllers\ScoreController::class, 'getSemiStudentInfo']);
 Route::get('/get-current-question-number', [App\Http\Controllers\ScoreController::class, 'getCurrentQuestionNumber']);
 Route::post('/insert-student-semiscore', [App\Http\Controllers\ScoreController::class, 'insertStudentSemiScore']);

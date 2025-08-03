@@ -7,6 +7,7 @@ use App\Models\FinalScore;
 use App\Models\SemiScore;
 use App\Models\StudentInfo;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class ScoreController extends Controller
@@ -24,12 +25,20 @@ class ScoreController extends Controller
 
     public function getFinalStudentInfo()
     {
-        return FinalScore::select('id', 'name', 'score')->get();
+        // return FinalScore::select('id', 'name', 'score')->get();
+
+        return FinalScore::select('name', DB::raw('SUM(CAST(score AS UNSIGNED)) as total_score'))
+            ->groupBy('name')
+            ->orderByDesc('total_score')
+            ->get();
     }
 
     public function getSemiStudentInfo()
     {
-        return SemiScore::select('id', 'name', 'school')->get();
+        return SemiScore::select('name', DB::raw('SUM(CAST(score AS UNSIGNED)) as total_score'))
+            ->groupBy('name')
+            ->orderByDesc('total_score')
+            ->get();
     }
 
     public function insertStudentSemiScore(Request $request)

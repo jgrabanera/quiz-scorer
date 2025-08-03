@@ -28,6 +28,7 @@ const Leaderboard = () => {
             .get("/get-student-final")
             .then((response) => {
                 setLeaderboardData(response.data);
+                console.log("Leaderboard Data:", response.data);
             })
             .catch((error) => {
                 console.error("Error fetching data:", error);
@@ -49,13 +50,13 @@ const Leaderboard = () => {
                     <thead>
                         <tr className="bg-gray-50">
                             <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">
-                                #
+                                Rank
                             </th>
-                            <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">
+                            <th className="px-4 py-2 text-r text-sm font-medium text-gray-700">
                                 Name
                             </th>
-                            <th className="px-4 py-2 text-right text-sm font-medium text-gray-700">
-                                Score
+                            <th className="px-4 py-2 text-center text-sm font-medium text-gray-700">
+                                Total Score
                             </th>
                         </tr>
                     </thead>
@@ -65,26 +66,36 @@ const Leaderboard = () => {
                                 key={user.name}
                                 className={`${
                                     index === 0
-                                        ? "bg-yellow-50"
+                                        ? "bg-yellow-100"
                                         : index === 1
-                                        ? "bg-gray-50"
+                                        ? "bg-gray-100"
                                         : index === 2
-                                        ? "bg-amber-50"
+                                        ? "bg-amber-100"
+                                        : index === 3
+                                        ? "bg-green-100"
+                                        : index === 4
+                                        ? "bg-blue-100"
                                         : "bg-white"
-                                } hover:bg-gray-100`}
+                                } hover:bg-gray-50 transition-colors duration-150`}
                             >
-                                <td className="px-4 py-3 flex items-center gap-2">
-                                    {getRankIcon(index)}
-                                    <span className="font-medium">
-                                        {index + 1}
-                                    </span>
+                                <td className="px-6 py-4 text-sm font-semibold text-gray-800">
+                                    <div className="flex items-center gap-2">
+                                        <span>{getRankIcon(index)}</span>
+                                        <span>#{index + 1}</span>
+                                    </div>
                                 </td>
-                                <td className="px-4 py-3 flex items-center gap-2">
-                                    <FaUserAlt className="text-gray-500" />
-                                    {user.name}
+
+                                <td className="px-6 py-4 text-sm text-gray-700">
+                                    <div className="flex  items-center gap-3">
+                                        <FaUserAlt className="text-gray-700 w-8 h-8 p-2  rounded-full bg-gray-300 flex items-center justify-center" />
+                                        <span className="font-medium truncate">
+                                            {user.name}
+                                        </span>
+                                    </div>
                                 </td>
-                                <td className="px-4 py-3 text-right font-semibold text-gray-700">
-                                    {user.score}
+
+                                <td className="px-6 py-4 text-sm font-bold text-center text-gray-900">
+                                    {user.total_score}
                                 </td>
                             </tr>
                         ))}
@@ -93,7 +104,7 @@ const Leaderboard = () => {
             </div>
 
             {/* Other Players Section */}
-            {/* <div className="bg-white shadow-md rounded-lg overflow-hidden">
+            <div className="bg-white shadow-md rounded-lg overflow-hidden">
                 <h2 className="bg-gray-100 px-6 py-3 text-lg font-semibold text-gray-700">
                     Other Players
                 </h2>
@@ -120,13 +131,13 @@ const Leaderboard = () => {
                                     {user.name}
                                 </td>
                                 <td className="px-4 py-3 text-right">
-                                    {user.score}
+                                    {user.total_score}
                                 </td>
                             </tr>
                         ))}
                     </tbody>
                 </table>
-            </div> */}
+            </div>
         </div>
     );
 };
