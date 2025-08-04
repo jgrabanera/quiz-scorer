@@ -15,7 +15,7 @@ return new class extends Migration {
             $table->text('name');
             $table->text('question');
             $table->text('score');
-            $table->int('save');
+            $table->integer('save');
             $table->timestamps();
         });
     }
