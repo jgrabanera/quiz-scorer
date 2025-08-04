@@ -9,6 +9,7 @@ use App\Models\StudentInfo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Http;
 
 class ScoreController extends Controller
 {
@@ -51,12 +52,20 @@ class ScoreController extends Controller
             'save' => 'required|boolean',
         ]);
 
+        
         SemiScore::create([
             'name' => $request->name,
             'question' => $request->question,
             'score' => $request->score,
             'save' => $request->save,
         ]);
+        
+        Http::post('http://localhost:3001/broadcast', [
+            'score' => $request->score,
+            'name' => $request->name,
+            'question' => $request->question,
+        ]);
+
 
         return response()->json([
             'message' => 'Student score inserted successfully.',
