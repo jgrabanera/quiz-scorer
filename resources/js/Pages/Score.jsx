@@ -55,7 +55,7 @@ const score = () => {
                 setCheckedStudents(prev =>
                     data.status === 'Inserted'
                         ? [...prev, data.name]
-                        : prev.filter(n => n !== name)
+                        : prev.filter(n => n !== data.name)
                 );
             }
         });
