@@ -1,9 +1,10 @@
 import Options from "@/Components/Options";
-import NextQButton from "@/Components/NextQButton";
 import ResetToZero from "@/Components/ResetToZero";
-import Playoff from "@/Components/Playoff";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
+import { io } from "socket.io-client";
+
+const socket = io("http://localhost:3001");
 
 const score = () => {
     const [students, setStudents] = useState([]);
@@ -11,28 +12,8 @@ const score = () => {
     const [level, setLevel] = useState(0);
     const [isFinal, setIsFinal] = useState(0);
     const [checkedStudents, setCheckedStudents] = useState([]);
-
-    const handleClick = (student) => {
-        axios
-            .post(
-                playoff == 0
-                    ? "/insert-student-semiscore"
-                    : "/insert-student-finalscore",
-                {
-                    name: student.name,
-                    question: qNumber,
-                    score: level,
-                    save: true, // Assuming 'save' is a boolean to indicate if the score is saved
-                }
-            )
-            .then((response) => {
-                console.log(response.data);
-            })
-            .catch((error) => {
-                console.error("Error creating user:", error);
-            });
-    };
-
+    const btnStyle = ' text-white  hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 '
+    const debounceRef = useRef(null);
     const stages = [
         {
             value: 0,
@@ -58,12 +39,41 @@ const score = () => {
             label: "Difficult",
         },
     ];
+    const [mySocketId, setMySocketId] = useState(null);
+
+    useEffect(() => {
+        socket.on("connect", () => {
+            setMySocketId(socket.id);
+        });
+
+        return () => socket.off("connect");
+    }, []);
+
+    useEffect(() => {
+        socket.on("chat message", (data) => {
+            if (data.number === qNumber && data.senderId !== mySocketId) {
+                setCheckedStudents(prev =>
+                    data.status === 'Inserted'
+                        ? [...prev, data.name]
+                        : prev.filter(n => n !== name)
+                );
+            }
+        });
+
+        return () => socket.off("chat message");
+    }, [qNumber, mySocketId]); 
+
+
 
     useEffect(() => {
         loadStudents();
         loadEvents();
         loadCheckedStudents();
     }, []);
+
+    useEffect(() => {
+        loadCheckedStudents();
+    }, [qNumber]);
 
     const loadStudents = () => {
         axios.get("/students").then((response) => {
@@ -85,10 +95,14 @@ const score = () => {
             });
     }
 
-    const loadCheckedStudents = ()=>{
-        axios.get('/load-checked-students').then(
-            res=>{
-                setCheckedStudents(res.data);
+    const loadCheckedStudents = () => {
+        axios.get('/load-checked-students/'+qNumber).then(
+            res => {
+                const names = res.data.map(student => student.name);
+                setCheckedStudents(names);
+                if (res.data.length > 0) {
+                    setLevel(res.data[0].score);
+                }
             }
         )
     }
@@ -107,15 +121,29 @@ const score = () => {
         const formData = new FormData();
         formData.append('stage', e.target.value)
         axios.post('/update-stage', formData).then(
-            setLevel(e.target.value)
+            res => {
+                setIsFinal(e.target.value)
+                resetItems()
+                setqNumber(1)
+            }
         ).catch((error) => {
             alert("❌ Error: Failed to update stage.");
         });
     }
 
+    const resetItems = () => {
+        axios.post('/reset-items').then(
+            res => {
+                setqNumber(1)
+            }
+        )
+    }
+
     const toggleStudentCheck = (name) => {
         const formData = new FormData();
         formData.append('name', name)
+        formData.append('number', qNumber)
+        formData.append('level', level)
         axios.post('/toggle-student-check', formData).then(
             res => {
                 setCheckedStudents(prev =>
@@ -123,9 +151,36 @@ const score = () => {
                         ? [...prev, name]
                         : prev.filter(n => n !== name)
                 );
+                socket.emit("chat message", {
+                    name,
+                    number: qNumber,
+                    senderId: socket.id,
+                    status: res.data.status
+                });
             }
         )
     }
+
+    const navigateQuestion = (actions) => {
+        const formData = new FormData();
+        formData.append('actions', actions)
+        axios.post('/navigate-questions', formData).then(
+            res => {
+                setqNumber(actions === 1 ? qNumber + 1 : qNumber - 1)
+            }
+        )
+    }
+
+    const jumpTo = (e) => {
+        const value = e.target.value;
+        clearTimeout(debounceRef.current);
+        debounceRef.current = setTimeout(() => {
+            axios.get('/jump-to/' + value)
+                .then(() => {
+                    setqNumber(value)
+                });
+        }, 2000);
+    };
 
     return (
         <div>
@@ -148,9 +203,10 @@ const score = () => {
                         itemValue="score"
                         itemName="label"
                         name="difficulty"
-                        defaultValue={difficulties.find(dif => Number(dif.score) === Number(level))?.label || "Unknown Difficulty"}
+                        value={level}
                         onChange={handleDifficultyChange}
                     />
+
 
                     <Options
                         id="stage"
@@ -158,16 +214,33 @@ const score = () => {
                         itemValue="value"
                         itemName="label"
                         name="stage"
-                        defaultValue={stages.find(dif => Number(dif.value) === Number(isFinal))?.label || "Unknown Stage"}
+                        value={isFinal}
                         onChange={handleStageChange}
                     />
 
+                    <div className="flex justify-center flex-row items-center">
+                        <button
+                            type="button"
+                            className={`${btnStyle} ${qNumber > 1 ? 'bg-blue-700' : 'bg-gray-400'}`}
+                            disabled={qNumber <= 1}
+                            onClick={() => navigateQuestion(0)}
+                        >
+                            Prev
+                        </button>
+                        <input type="text"
+                            placeholder="Jump to"
+                            onChange={jumpTo}
+                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block
+                            mx-2 w-full p-2.5"
+                        />
+                        <button
+                            type="button"
+                            className={`${btnStyle} bg-blue-700`}
+                            onClick={() => navigateQuestion(1)}>
+                            Next
+                        </button>
+                    </div>
 
-                    <NextQButton
-                        qNumber={qNumber}
-                        setqNumber={setqNumber}
-                        name={"Next Q"}
-                    />
                 </div>
                 <br />
                 <div className="">
@@ -187,7 +260,6 @@ const score = () => {
                             );
                         })}
                     </div>
-
                 </div>
             </div>
         </div>

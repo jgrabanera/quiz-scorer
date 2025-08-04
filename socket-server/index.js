@@ -1,25 +1,32 @@
-const { Server } = require("socket.io");
-const http = require("http");
-const cors = require("cors");
+// server.js
 const express = require("express");
+const http = require("http");
+const { Server } = require("socket.io");
+const cors = require("cors");
 
 const app = express();
-const server = http.createServer(app);
+app.use(cors());
 
+const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "*", // for dev; restrict in production
+    origin: "*",
     methods: ["GET", "POST"],
   },
 });
-
 io.on("connection", (socket) => {
-  console.log("Client connected:", socket.id);
+  console.log("User connected:", socket.id);
+
+  socket.on("chat message", (data) => {
+    console.log("Received:", data);
+    io.emit("chat message", data); 
+  });
+
+  socket.on("disconnect", () => {
+    console.log("User disconnected:", socket.id);
+  });
 });
 
-// Listen for messages from Laravel
-const PORT = 3001;
-server.listen(PORT, () => console.log(`Socket.IO server on port ${PORT}`));
-
-// You can later expose `io` so Laravel can POST to this server
-module.exports.io = io;
+server.listen(3001, () => {
+  console.log("Socket.IO server running on http://localhost:3001");
+});

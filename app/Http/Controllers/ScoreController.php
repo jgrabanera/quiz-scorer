@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\CurrentQuestion;
 use App\Models\FinalScore;
+use App\Models\Score;
 use App\Models\SemiScore;
 use App\Models\StudentInfo;
 use Illuminate\Http\Request;
@@ -52,14 +53,14 @@ class ScoreController extends Controller
             'save' => 'required|boolean',
         ]);
 
-        
+
         SemiScore::create([
             'name' => $request->name,
             'question' => $request->question,
             'score' => $request->score,
             'save' => $request->save,
         ]);
-        
+
         Http::post('http://localhost:3001/broadcast', [
             'score' => $request->score,
             'name' => $request->name,
@@ -166,4 +167,6 @@ class ScoreController extends Controller
             'number' => $request->number
         ]);
     }
+
+
 }

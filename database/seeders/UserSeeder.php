@@ -4,7 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use App\Models\StudentInfo;
+use App\Models\Student;
 
 class UserSeeder extends Seeder
 {
@@ -65,6 +65,6 @@ class UserSeeder extends Seeder
             ['name' => 'Samuel Iginson U. Langit', 'school' => 'University of the Cordilleras Integrated School', 'address' => 'Benguet'],
             ['name' => 'Shizue Balantis Ando', 'school' => "St. William's Academy, Bulanao Inc.", 'address' => 'Kalinga'],
         ];
-        StudentInfo::insertOrIgnore($users);
+        Student::insertOrIgnore($users);
     }
 }

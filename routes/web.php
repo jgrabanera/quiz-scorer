@@ -29,30 +29,9 @@ Route::get('/', function () {
 Route::get('/score', function () {
     return Inertia::render('Score');
 });
-Route::get('/get-student-info', [App\Http\Controllers\ScoreController::class, 'getStudentInfo']);
-Route::get('/get-student-final', [App\Http\Controllers\ScoreController::class, 'getFinalStudentInfo']);
-Route::get('/get-final-score', [App\Http\Controllers\ScoreController::class, 'getFinalScore']);
-Route::get('/get-student-semi', [App\Http\Controllers\ScoreController::class, 'getSemiStudentInfo']);
-Route::get('/get-current-question-number', [App\Http\Controllers\ScoreController::class, 'getCurrentQuestionNumber']);
-Route::post('/insert-student-semiscore', [App\Http\Controllers\ScoreController::class, 'insertStudentSemiScore']);
-Route::post('/insert-student-finalscore', [App\Http\Controllers\ScoreController::class, 'insertStudentFinalScore']);
-Route::post('/update-current-question-number', [App\Http\Controllers\ScoreController::class, 'updateCurrentQuestionNumber']);
-Route::post('/update-level', [App\Http\Controllers\ScoreController::class, 'updateLevel']);
-Route::post('/update-playoff', [App\Http\Controllers\ScoreController::class, 'updatePlayoff']);
-Route::post('/update-student-score', [App\Http\Controllers\ScoreController::class, 'updateStudentScore']);
 
-Route::get('/leaderboard', function () {
+Route::get('/leaderboards', function () {
     return Inertia::render('Leaderboard');
-});
-
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
-
-Route::middleware('auth')->group(function () {
-    // Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    // Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    // Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
 require __DIR__ . '/auth.php';

@@ -14,7 +14,6 @@ class EventSeeder extends Seeder
     public function run(): void
     {
         $event = [
-            'id' => 1,
             'number'=> 1,
             'level' => 1,
         ];
