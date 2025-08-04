@@ -8,8 +8,8 @@ const socket = io("http://localhost:3001");
 
 const score = () => {
     const [students, setStudents] = useState([]);
-    const [qNumber, setqNumber] = useState(0);
-    const [level, setLevel] = useState(0);
+    const [qNumber, setqNumber] = useState(1);
+    const [level, setLevel] = useState(1);
     const [isFinal, setIsFinal] = useState(0);
     const [checkedStudents, setCheckedStudents] = useState([]);
     const debounceRef = useRef(null);
@@ -72,7 +72,7 @@ const score = () => {
     useEffect(() => {
         if (qNumber !== 0)
             loadCheckedStudents();
-    }, [qNumber]);
+    }, [qNumber,isFinal]);
 
     const loadStudents = () => {
         axios.get("/students/"+isFinal).then((response) => {

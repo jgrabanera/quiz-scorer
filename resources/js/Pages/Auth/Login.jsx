@@ -59,7 +59,7 @@ export default function Login() {
                 
 
                 <div className="flex items-center justify-end mt-4">
-                    <PrimaryButton className="ms-4" >
+                    <PrimaryButton className="ms-4 bg-blue-500 text-white" >
                         Log in
                     </PrimaryButton>
                 </div>
