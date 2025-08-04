@@ -5,17 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class FinalScore extends Model
+class Student extends Model
 {
     use HasFactory;
-
-    protected $table = 'tbl_score_finals';
+    protected $table = 'tbl_students';
     protected $primaryKey = 'id';
-
     protected $fillable = [
         'name',
-        'question',
-        'score',
-        'save',
+        'school',
+        'address',
+        'is_finalist',
     ];
 }

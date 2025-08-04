@@ -9,12 +9,12 @@ class CurrentQuestion extends Model
 {
     use HasFactory;
 
-    protected $table = 'tbl_current_question';
+    protected $table = 'tbl_current';
     protected $primaryKey = 'id';
 
     protected $fillable = [
-        'nuumber',
-        'current_point',
-        'current_playoff',
+        'number',
+        'level',
+        'is_final',
     ];
 }

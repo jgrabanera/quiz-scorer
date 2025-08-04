@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('tbl_current_question', function (Blueprint $table) {
+        Schema::create('tbl_current', function (Blueprint $table) {
             $table->id();
             $table->integer('number')->default(1);
+            $table->integer('level')->default(1);
+            $table->integer('is_final')->default(0);
             $table->timestamps();
         });
     }

@@ -1,4 +1,4 @@
-import Dropdown from "@/Components/Dropdown";
+import Options from "@/Components/Options";
 import NextQButton from "@/Components/NextQButton";
 import ResetToZero from "@/Components/ResetToZero";
 import Playoff from "@/Components/Playoff";
@@ -6,10 +6,11 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 
 const score = () => {
-    const [tblStudent, setTblStudent] = useState([]);
+    const [students, setStudents] = useState([]);
     const [qNumber, setqNumber] = useState();
     const [level, setLevel] = useState(0);
-    const [playoff, setPlayoff] = useState(0);
+    const [isFinal, setIsFinal] = useState(0);
+    const [checkedStudents, setCheckedStudents] = useState([]);
 
     const handleClick = (student) => {
         axios
@@ -32,7 +33,7 @@ const score = () => {
             });
     };
 
-    const playoffItems = [
+    const stages = [
         {
             value: 0,
             label: "Semi Finals",
@@ -43,7 +44,7 @@ const score = () => {
         },
     ];
 
-    const dropDownItems = [
+    const difficulties = [
         {
             score: 1,
             label: "Easy",
@@ -59,39 +60,72 @@ const score = () => {
     ];
 
     useEffect(() => {
-        axios
-            .get("/get-student-info")
-            .then((response) => {
-                setTblStudent(response.data);
-            })
-            .catch((error) => {
-                console.error("Error fetching data:", error);
-            });
-        axios
-            .get("/get-current-question-number")
-            .then((response) => {
-                console.log(
-                    "Question Number:",
-                    response.data.number,
-                    ", Playoff:",
-                    response.data.current_playoff == 0
-                        ? "Semi Finals"
-                        : "Finals,",
-                    "Point:",
-                    response.data.current_point == 1
-                        ? "Easy || 1"
-                        : response.data.current_point == 3
-                        ? "Average || 3"
-                        : "Difficult || 5"
-                );
-                setPlayoff(response.data.current_playoff);
-                setqNumber(response.data.number);
-                setLevel(response.data.current_point);
-            })
-            .catch((error) => {
-                console.error("Error fetching data:", error);
-            });
+        loadStudents();
+        loadEvents();
+        loadCheckedStudents();
     }, []);
+
+    const loadStudents = () => {
+        axios.get("/students").then((response) => {
+            setStudents(response.data);
+        }).catch((error) => {
+            alert("❌ Error: Failed to load students.");
+        })
+    }
+
+    const loadEvents = () => {
+        axios.get("/events")
+            .then((response) => {
+                setIsFinal(response.data.is_final);
+                setqNumber(response.data.number);
+                setLevel(response.data.level);
+            })
+            .catch((error) => {
+                alert("❌ Error: Failed to load events.");
+            });
+    }
+
+    const loadCheckedStudents = ()=>{
+        axios.get('/load-checked-students').then(
+            res=>{
+                setCheckedStudents(res.data);
+            }
+        )
+    }
+
+    const handleDifficultyChange = (e) => {
+        const formData = new FormData();
+        formData.append('level', e.target.value)
+        axios.post('/update-difficulty', formData).then(
+            setLevel(e.target.value)
+        ).catch((error) => {
+            alert("❌ Error: Failed to update difficulty.");
+        });
+    }
+
+    const handleStageChange = (e) => {
+        const formData = new FormData();
+        formData.append('stage', e.target.value)
+        axios.post('/update-stage', formData).then(
+            setLevel(e.target.value)
+        ).catch((error) => {
+            alert("❌ Error: Failed to update stage.");
+        });
+    }
+
+    const toggleStudentCheck = (name) => {
+        const formData = new FormData();
+        formData.append('name', name)
+        axios.post('/toggle-student-check', formData).then(
+            res => {
+                setCheckedStudents(prev =>
+                    res.data.status === 'Inserted'
+                        ? [...prev, name]
+                        : prev.filter(n => n !== name)
+                );
+            }
+        )
+    }
 
     return (
         <div>
@@ -108,18 +142,26 @@ const score = () => {
 
                 <br />
                 <div className="flex flex-row justify-between items-center ">
-                    <Dropdown
-                        qNumber={qNumber}
-                        setqNumber={setqNumber}
-                        level={level}
-                        setLevel={setLevel}
-                        items={dropDownItems}
+                    <Options
+                        id="difficulty"
+                        items={difficulties}
+                        itemValue="score"
+                        itemName="label"
+                        name="difficulty"
+                        defaultValue={difficulties.find(dif => Number(dif.score) === Number(level))?.label || "Unknown Difficulty"}
+                        onChange={handleDifficultyChange}
                     />
-                    <Playoff
-                        playoff={playoff}
-                        setPlayoff={setPlayoff}
-                        items={playoffItems}
+
+                    <Options
+                        id="stage"
+                        items={stages}
+                        itemValue="value"
+                        itemName="label"
+                        name="stage"
+                        defaultValue={stages.find(dif => Number(dif.value) === Number(isFinal))?.label || "Unknown Stage"}
+                        onChange={handleStageChange}
                     />
+
 
                     <NextQButton
                         qNumber={qNumber}
@@ -130,21 +172,23 @@ const score = () => {
                 <br />
                 <div className="">
                     <div className="grid grid-cols-3 sm:grid-cols-2 md:grid-cols-6 lg:grid-cols-10 gap-2">
-                        {tblStudent.map((student, index) => (
-                            <div
-                                key={index}
-                                onClick={() => handleClick(student)}
-                                className="bg-gray-200 hover:bg-green-300 text-center p-4 rounded shadow"
-                            >
-                                <span className="font-bold">{student.id}</span>
-                                <span className="text-xs line-clamp-2 capitalize">
-                                    {student.name}
-                                </span>
-                            </div>
-                        ))}
+                        {students.map((student, index) => {
+                            const isChecked = checkedStudents.includes(student.name);
+                            return (
+                                <div
+                                    key={index}
+                                    onClick={() => toggleStudentCheck(student.name)}
+                                    className={`text-center p-4 rounded shadow cursor-pointer transition-all duration-200 ${isChecked ? 'bg-green-400' : 'bg-gray-200 '
+                                        }`}
+                                >
+                                    <span className="font-bold">{student.id}</span>
+                                    <span className="text-xs line-clamp-2 capitalize block">{student.name}</span>
+                                </div>
+                            );
+                        })}
                     </div>
+
                 </div>
-                {/* table */}
             </div>
         </div>
     );

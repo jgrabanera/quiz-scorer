@@ -15,7 +15,8 @@ return new class extends Migration
             $table->id();
             $table->text('name');
             $table->text('school');
-            $table->text('province');
+            $table->text('address');
+            $table->integer('is_finalist')->default(0);
             $table->timestamps();
         });
     }
