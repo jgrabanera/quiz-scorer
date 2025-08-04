@@ -13,6 +13,7 @@ class ScoreController extends Controller
     {
         $existing = Score::where('name', $req->name)
             ->where('question', $req->number)
+            ->where('is_final', $req->stage)
             ->first();
 
         if ($existing) {
@@ -23,14 +24,15 @@ class ScoreController extends Controller
                 'name' => $req->name,
                 'question' => $req->number,
                 'score' => $req->level,
+                'is_final'=> $req->stage
             ]);
             return response()->json(['status' => 'Inserted']);
         }
     }
 
-    public function loadCheckedStudents(String $number)
+    public function loadCheckedStudents(String $number, String $final)
     {
-        $checked = Score::where('question', $number)
+        $checked = Score::where('question', $number)->where('is_final', $final)
             ->get();
 
         return response()->json($checked);

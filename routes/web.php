@@ -1,8 +1,6 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\ScoreController;
-use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -17,23 +15,28 @@ use Inertia\Inertia;
  * |
  */
 
+Route::middleware(['auth'])->group(function () {
+    Route::get('/dashboard', function () {
+        return Inertia::render('Dashboard');
+    });
+
+    Route::get('/score', function () {
+        return Inertia::render('Score');
+    });
+
+    Route::get('/leaderboards', function () {
+        return Inertia::render('Leaderboard');
+    });
+    
+    Route::get('/finalist', function () {
+        return Inertia::render('Finalist');
+    });
+});
+
 Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
-});
+    return Inertia::render('Auth/Login');
+})->name('login')->middleware('guest');
+Route::post('/login', [ProfileController::class, 'login'])->middleware('guest');
+Route::get('/logout', [ProfileController::class, 'logout']);
 
-Route::get('/score', function () {
-    return Inertia::render('Score');
-});
-
-Route::get('/leaderboards', function () {
-    return Inertia::render('Leaderboard');
-});
-
-require __DIR__ . '/auth.php';
 require __DIR__ . '/score_routes.php';
-

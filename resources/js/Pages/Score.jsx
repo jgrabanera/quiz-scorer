@@ -1,18 +1,17 @@
 import Options from "@/Components/Options";
-import ResetToZero from "@/Components/ResetToZero";
 import axios from "axios";
 import { useEffect, useState, useRef } from "react";
 import { io } from "socket.io-client";
-
+import ApplicationLogo from "@/Components/ApplicationLogo";
+import { Link } from "@inertiajs/react";
 const socket = io("http://localhost:3001");
 
 const score = () => {
     const [students, setStudents] = useState([]);
-    const [qNumber, setqNumber] = useState();
+    const [qNumber, setqNumber] = useState(0);
     const [level, setLevel] = useState(0);
     const [isFinal, setIsFinal] = useState(0);
     const [checkedStudents, setCheckedStudents] = useState([]);
-    const btnStyle = ' text-white  hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 '
     const debounceRef = useRef(null);
     const stages = [
         {
@@ -51,7 +50,7 @@ const score = () => {
 
     useEffect(() => {
         socket.on("chat message", (data) => {
-            if (data.number === qNumber && data.senderId !== mySocketId) {
+            if (data.number === qNumber && data.senderId !== mySocketId && data.stage === isFinal) {
                 setCheckedStudents(prev =>
                     data.status === 'Inserted'
                         ? [...prev, data.name]
@@ -61,22 +60,22 @@ const score = () => {
         });
 
         return () => socket.off("chat message");
-    }, [qNumber, mySocketId]); 
+    }, [qNumber, mySocketId]);
 
 
 
     useEffect(() => {
         loadStudents();
         loadEvents();
-        loadCheckedStudents();
-    }, []);
+    }, [isFinal]);
 
     useEffect(() => {
-        loadCheckedStudents();
+        if (qNumber !== 0)
+            loadCheckedStudents();
     }, [qNumber]);
 
     const loadStudents = () => {
-        axios.get("/students").then((response) => {
+        axios.get("/students/"+isFinal).then((response) => {
             setStudents(response.data);
         }).catch((error) => {
             alert("❌ Error: Failed to load students.");
@@ -96,7 +95,7 @@ const score = () => {
     }
 
     const loadCheckedStudents = () => {
-        axios.get('/load-checked-students/'+qNumber).then(
+        axios.get('/load-checked-students/' + qNumber + '/' + isFinal).then(
             res => {
                 const names = res.data.map(student => student.name);
                 setCheckedStudents(names);
@@ -144,6 +143,7 @@ const score = () => {
         formData.append('name', name)
         formData.append('number', qNumber)
         formData.append('level', level)
+        formData.append('stage', isFinal)
         axios.post('/toggle-student-check', formData).then(
             res => {
                 setCheckedStudents(prev =>
@@ -154,6 +154,7 @@ const score = () => {
                 socket.emit("chat message", {
                     name,
                     number: qNumber,
+                    stage: isFinal,
                     senderId: socket.id,
                     status: res.data.status
                 });
@@ -183,20 +184,23 @@ const score = () => {
     };
 
     return (
-        <div>
-            <div className="p-2">
-                <div className="w-full bg-blue-200 p-3 text-3xl text-center font-bold flex justify-center items-center  gap-2">
-                    <ResetToZero
-                        qNumber={qNumber}
-                        setqNumber={setqNumber}
-                        name={"Reset Q"}
-                    />
+        <div className="min-h-screen bg-blue-50 p-6 relative">
+            {/* Header */}
+            <div className="w-full gap-4 mb-6 ">
+                <ApplicationLogo className="w-64 mx-auto" />
+                <h1 className="text-2xl font-bold text-gray-800 drop-shadow">
+                    Question No. {qNumber}
+                </h1>
+                <Link href="/dashboard">
+                    <div className="bg-blue-400 rounded-lg shadow-md px-4 py-2 w-fit text-white absolute md:top-4 md:left-4 top-1 left-1">
+                        Back
+                    </div>
+                </Link>
+            </div>
 
-                    <h1>Question no. {qNumber}</h1>
-                </div>
-
-                <br />
-                <div className="flex flex-row justify-between items-center ">
+            {/* Controls */}
+            <div className="flex flex-col md:flex-row justify-between items-center gap-4 bg-blue-400 border border-yellow-400 rounded-lg p-4 shadow-md mb-6">
+                <div className="flex flex-row gap-2">
                     <Options
                         id="difficulty"
                         items={difficulties}
@@ -206,8 +210,6 @@ const score = () => {
                         value={level}
                         onChange={handleDifficultyChange}
                     />
-
-
                     <Options
                         id="stage"
                         items={stages}
@@ -217,52 +219,56 @@ const score = () => {
                         value={isFinal}
                         onChange={handleStageChange}
                     />
-
-                    <div className="flex justify-center flex-row items-center">
-                        <button
-                            type="button"
-                            className={`${btnStyle} ${qNumber > 1 ? 'bg-blue-700' : 'bg-gray-400'}`}
-                            disabled={qNumber <= 1}
-                            onClick={() => navigateQuestion(0)}
-                        >
-                            Prev
-                        </button>
-                        <input type="text"
-                            placeholder="Jump to"
-                            onChange={jumpTo}
-                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block
-                            mx-2 w-full p-2.5"
-                        />
-                        <button
-                            type="button"
-                            className={`${btnStyle} bg-blue-700`}
-                            onClick={() => navigateQuestion(1)}>
-                            Next
-                        </button>
-                    </div>
-
                 </div>
-                <br />
-                <div className="">
-                    <div className="grid grid-cols-3 sm:grid-cols-2 md:grid-cols-6 lg:grid-cols-10 gap-2">
-                        {students.map((student, index) => {
-                            const isChecked = checkedStudents.includes(student.name);
-                            return (
-                                <div
-                                    key={index}
-                                    onClick={() => toggleStudentCheck(student.name)}
-                                    className={`text-center p-4 rounded shadow cursor-pointer transition-all duration-200 ${isChecked ? 'bg-green-400' : 'bg-gray-200 '
-                                        }`}
-                                >
-                                    <span className="font-bold">{student.id}</span>
-                                    <span className="text-xs line-clamp-2 capitalize block">{student.name}</span>
-                                </div>
-                            );
-                        })}
-                    </div>
+
+                <div className="flex items-center gap-2">
+                    <button
+                        type="button"
+                        className={`px-4 py-2 rounded font-semibold text-white transition ${qNumber > 1 ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-400 cursor-not-allowed'}`}
+                        disabled={qNumber <= 1}
+                        onClick={() => navigateQuestion(0)}
+                    >
+                        Prev
+                    </button>
+
+                    <input
+                        type="text"
+                        placeholder="Jump to"
+                        onChange={jumpTo}
+                        className="w-24 sm:w-32 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    />
+
+                    <button
+                        type="button"
+                        className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded font-semibold transition"
+                        onClick={() => navigateQuestion(1)}
+                    >
+                        Next
+                    </button>
                 </div>
             </div>
+
+            {/* Student Grid */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-10 gap-3">
+                {students.map((student, index) => {
+                    const isChecked = checkedStudents.includes(student.name);
+                    return (
+                        <div
+                            key={index}
+                            onClick={() => toggleStudentCheck(student.name)}
+                            className={`p-4 rounded-xl shadow-sm cursor-pointer transition transform hover:scale-105 text-center  ${isChecked
+                                ? 'bg-blue-500 text-white border-yellow-400 border-2'
+                                : 'bg-white text-gray-800 border-blue-300 hover:bg-gray-100 border'
+                                }`}
+                        >
+                            <div className="font-bold text-lg">{student.id}</div>
+                            <div className="text-sm capitalize line-clamp-2">{student.name}</div>
+                        </div>
+                    );
+                })}
+            </div>
         </div>
+
     );
 };
 

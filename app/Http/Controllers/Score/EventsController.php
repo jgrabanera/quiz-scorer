@@ -23,7 +23,7 @@ class EventsController extends Controller
                 'level' => $req->level
             ]
         );
-        Score::where('question',$current_event->number)->update(['score' => $current_event->level]);
+        Score::where('question',$current_event->number)->where('is_final', $current_event->is_final)->update(['score' => $current_event->level]);
         return response()->json(['status' => 'Difficulty Updated Successfully!']);
     }
 
