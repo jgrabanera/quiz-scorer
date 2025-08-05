@@ -72,10 +72,10 @@ const score = () => {
     useEffect(() => {
         if (qNumber !== 0)
             loadCheckedStudents();
-    }, [qNumber,isFinal]);
+    }, [qNumber, isFinal]);
 
     const loadStudents = () => {
-        axios.get("/students/"+isFinal).then((response) => {
+        axios.get("/students/" + isFinal).then((response) => {
             setStudents(response.data);
         }).catch((error) => {
             alert("❌ Error: Failed to load students.");
@@ -163,13 +163,40 @@ const score = () => {
     }
 
     const navigateQuestion = (actions) => {
+        const number = actions === 1 ? qNumber + 1 : qNumber - 1;
         const formData = new FormData();
         formData.append('actions', actions)
         axios.post('/navigate-questions', formData).then(
             res => {
-                setqNumber(actions === 1 ? qNumber + 1 : qNumber - 1)
+                setqNumber(number)
             }
         )
+
+        if (isFinal == 0) {
+            if (number <= 10) {
+                setLevel(1)
+            }
+            else if (number > 10 && number <= 20) {
+                setLevel(3)
+            }
+            else if (number > 20) {
+                setLevel(5)
+            }
+        }
+        else {
+            if (number <= 5) {
+                setLevel(1)
+            }
+            else if (number > 5 && number <= 10) {
+                setLevel(3)
+            }
+            else if (number > 10) {
+                setLevel(5)
+            }
+        }
+
+
+
     }
 
     const jumpTo = (e) => {

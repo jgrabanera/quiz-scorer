@@ -72,14 +72,15 @@ const Leaderboard = () => {
                     <table className="w-full divide-y divide-gray-200 text-sm">
                         <thead className="bg-gray-50">
                             <tr>
-                                <th className="px-6 py-3 text-left font-medium text-gray-700">Rank</th>
-                                <th className="px-6 py-3 text-left font-medium text-gray-700">Name</th>
-                                <th className="px-6 py-3 text-center font-medium text-gray-700">Score</th>
+                                <th className="px-6 py-3 text-center font-extrabold text-gray-700">Contestant No.</th>
+                                <th className="px-6 py-3 text-left font-extrabold text-gray-700">Name</th>
+                                <th className="px-6 py-3 text-center font-extrabold text-gray-700">School</th>
+                                <th className="px-6 py-3 text-center font-extrabold text-gray-700">Score</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
                             <AnimatePresence>
-                                {leaderboards.slice(0, 5).map((user, index) => (
+                                {leaderboards.map((user, index) => (
                                     <motion.tr
                                         key={`${user.name}-${user.total_score}`}
                                         initial={{ opacity: 0, y: -10, scale: 0.95 }}
@@ -89,26 +90,25 @@ const Leaderboard = () => {
                                         layout
                                         className={`
                                         transition-all duration-150 hover:bg-gray-50
-                                        ${index === 0 ? 'bg-blue-100' :
-                                                index === 1 ? 'bg-yellow-100' :
-                                                    index === 2 ? 'bg-green-100' :
-                                                        index === 3 ? 'bg-pink-100' :
-                                                            'bg-red-50'}
+                                        ${index % 2 === 0 ? 'bg-blue-50' : 'bg-white'}
+                                                            
                                     `}
                                     >
-                                        <td className="px-6 py-4 font-semibold text-gray-800">
-                                            <div className="flex items-center gap-2">
-                                                {getRankIcon(index)}
-                                                <span className="text-lg">{index + 1}</span>
+                                        <td className="px-6 py-4 font-semibold text-gray-800 ">
+                                            <div className="flex items-center gap-2 justify-center">
+                                                #{user.id}
                                             </div>
                                         </td>
                                         <td className="px-6 py-4 text-gray-700">
                                             <div className="flex items-center gap-3">
                                                 <FaUserAlt className="text-white bg-gray-400 w-6 h-6 rounded-full p-1" />
-                                                <span className=" text-sm font-medium truncate">{user.name}</span>
+                                                <span className=" text-sm truncate font-extrabold">{user.name}</span>
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4 text-center  text-blue-600 font-extrabold text-md">
+                                        <td className="px-6 py-4 text-center    text-md">
+                                            {user.school}
+                                        </td>
+                                        <td className="px-6 py-4 text-center text-blue-600 font-extrabold text-lg">
                                             {user.total_score}
                                         </td>
                                     </motion.tr>
@@ -117,38 +117,6 @@ const Leaderboard = () => {
                         </tbody>
                     </table>
                 </div>
-
-                {/* Other Players */}
-                {isFinal == 0 && (
-                    <div className="bg-white rounded-lg shadow-lg overflow-hidden p-2">
-                        <div className="bg-gray-700 px-6 py-4">
-                            <h2 className="text-lg font-semibold text-gray-50">Other Participants</h2>
-                        </div>
-                        <table className="w-full divide-y divide-gray-200 text-sm">
-                            <thead className="bg-gray-50">
-                                <tr>
-                                    <th className="px-4 py-3 text-left text-gray-700 font-medium">#</th>
-                                    <th className="px-4 py-3 text-left text-gray-700 font-medium">Name</th>
-                                    <th className="px-4 py-3 text-right text-gray-700 font-medium">Score</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-100">
-                                {leaderboards.slice(5).map((user, index) => (
-                                    <tr key={user.name} className="hover:bg-gray-50">
-                                        <td className="px-4 py-3">{index + 6}</td>
-                                        <td className="px-4 py-3 flex items-center gap-2 text-gray-800">
-                                            <FaUserAlt className="text-gray-500" />
-                                            {user.name}
-                                        </td>
-                                        <td className="px-4 py-3 text-right text-gray-700 font-semibold">
-                                            {user.total_score}
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                )}
             </div>
         </div>
     );

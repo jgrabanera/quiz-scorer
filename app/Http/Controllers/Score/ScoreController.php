@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\CurrentQuestion;
 use App\Models\Score;
 use Illuminate\Support\Facades\DB;
+
 class ScoreController extends Controller
 {
     public function toggleStudentCheck(Request $req)
@@ -24,7 +25,7 @@ class ScoreController extends Controller
                 'name' => $req->name,
                 'question' => $req->number,
                 'score' => $req->level,
-                'is_final'=> $req->stage
+                'is_final' => $req->stage
             ]);
             return response()->json(['status' => 'Inserted']);
         }
@@ -40,9 +41,15 @@ class ScoreController extends Controller
 
     public function loadLeaderboards(String $stage)
     {
-        return Score::where('is_final', $stage)
-            ->select('name', DB::raw('SUM(score) as total_score'))
-            ->groupBy('name')
+        return Score::where('tbl_score.is_final', $stage)
+            ->leftJoin('tbl_students', 'tbl_students.name', '=', 'tbl_score.name')
+            ->select(
+                'tbl_students.id',
+                'tbl_students.name',
+                'tbl_students.school',
+                DB::raw('SUM(tbl_score.score) as total_score')
+            )
+            ->groupBy('tbl_students.name', 'tbl_students.school', 'tbl_students.id')
             ->orderByDesc('total_score')
             ->get();
     }
