@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import { io } from "socket.io-client";
 import ApplicationLogo from "@/Components/ApplicationLogo";
 import { Link } from "@inertiajs/react";
-const socket = io("http://10.10141.77:3001");
+const socket = io("http://10.10.141.77:3001");
 
 const score = () => {
     const [students, setStudents] = useState([]);
