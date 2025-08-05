@@ -10,7 +10,7 @@ class ChatController extends Controller
     public function send(Request $request)
     {
         $message = $request->input('message');
-        Http::post('http://localhost:3001/broadcast', [
+        Http::post('http://10.10.141.77:3001/broadcast', [
             'message' => $message,
         ]);
 
