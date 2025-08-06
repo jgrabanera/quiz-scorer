@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import { io } from "socket.io-client";
 import ApplicationLogo from "@/Components/ApplicationLogo";
 import { Link } from "@inertiajs/react";
-const socket = io("http://192.168.2.145:3001");
+const socket = io("http://192.168.0.101:3001");
 
 const score = () => {
     const [students, setStudents] = useState([]);
@@ -319,7 +319,7 @@ const score = () => {
                                 }`}
                         >
                             <div className="font-bold text-lg">{student.id}</div>
-                            <div className="text-sm capitalize line-clamp-2">{student.name}</div>
+                            <div className="text-sm capitalize line-clamp-2 font-medium">{student.name.toUpperCase()}</div>
                         </div>
                     );
                 })}

@@ -5,7 +5,7 @@ import { io } from "socket.io-client";
 import ApplicationLogo from "@/Components/ApplicationLogo";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "@inertiajs/react";
-const socket = io("http://192.168.2.145:3001");
+const socket = io("http://192.168.0.101:3001");
 
 
 const Leaderboard = () => {
@@ -70,15 +70,15 @@ const Leaderboard = () => {
                 {/* Top 5 Players */}
                 <div className="bg-white rounded-md shadow-lg overflow-hidden mb-8 p-2">
                     <div className="bg-blue-500 px-6 py-4 rounded-t-md">
-                        <h2 className="text-xl font-semibold text-gray-100"> 🏆 Top 5 Players</h2>
+                        <h2 className="text-2xl font-semibold text-gray-100"> 🏆 Leaderboard</h2>
                     </div>
                     <table className="w-full divide-y divide-gray-200 text-sm">
-                        <thead className="bg-gray-50">
+                        <thead className="bg-blue-200">
                             <tr>
-                                <th className="px-6 py-3 text-center font-extrabold text-gray-700">Contestant No.</th>
-                                <th className="px-6 py-3 text-left font-extrabold text-gray-700">Name</th>
-                                <th className="px-6 py-3 text-center font-extrabold text-gray-700">School</th>
-                                <th className="px-6 py-3 text-center font-extrabold text-gray-700">Score</th>
+                                <th className="px-6 py-5 text-center font-extrabold text-gray-700 text-lg">CONTESTANT NO.</th>
+                                <th className="px-6 py-5 text-left font-extrabold text-gray-700 text-lg">NAME</th>
+                                <th className="px-6 py-5 text-center font-extrabold text-gray-700 text-lg">SCHOOL</th>
+                                <th className="px-6 py-5 text-center font-extrabold text-gray-700 text-lg">SCORE</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
@@ -97,7 +97,7 @@ const Leaderboard = () => {
                                                             
                                     `}
                                     >
-                                        <td className="px-6 py-4 font-semibold text-gray-800 ">
+                                        <td className="px-6 py-4 font-semibold text-blue-800 ">
                                             <div className="flex items-center gap-2 justify-center text-xl">
                                                 #{user.id}
                                             </div>
@@ -105,13 +105,13 @@ const Leaderboard = () => {
                                         <td className="px-6 py-4 text-gray-700">
                                             <div className="flex items-center gap-3">
                                                 <FaUserAlt className="text-white bg-gray-400 w-6 h-6 rounded-full p-1" />
-                                                <span className=" text-lg truncate font-extrabold">{user.name}</span>
+                                                <span className=" text-lg truncate font-bold">{user.name.toUpperCase()}</span>
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4 text-center    text-base font-semibold">
-                                            {user.school}
+                                        <td className="px-6 py-4 text-center    text-base font-medium">
+                                            {user.school.toUpperCase()}
                                         </td>
-                                        <td className="px-6 py-4 text-center text-blue-600 font-extrabold text-xl">
+                                        <td className="px-6 py-4 text-center text-gray-600 font-extrabold text-xl">
                                             {user.total_score}
                                         </td>
                                     </motion.tr>
