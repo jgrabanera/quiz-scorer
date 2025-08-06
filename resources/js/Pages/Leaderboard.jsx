@@ -1,31 +1,41 @@
 import { FaMedal, FaUserAlt, FaStar } from "react-icons/fa";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Options from "@/Components/Options";
 import { io } from "socket.io-client";
 import ApplicationLogo from "@/Components/ApplicationLogo";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "@inertiajs/react";
-const socket = io("http://10.10.141.122:3001");
+const socket = io("http://192.168.2.145:3001");
 
 
 const Leaderboard = () => {
     const [leaderboards, setLeaderboards] = useState([]);
     const [isFinal, setIsFinal] = useState(0);
+    const isFinalRef = useRef(isFinal);
     const stages = [
         { value: 0, label: "Semi Finals" },
         { value: 1, label: "Finals" },
     ];
 
     useEffect(() => {
-        loadLeaderBoards();
-    },[isFinal]);
+        isFinalRef.current = isFinal;
+        loadLeaderBoards(); 
+    }, [isFinal]);
 
     useEffect(() => {
-        socket.on("chat message", loadLeaderBoards);
-        return () => socket.off("chat message");
+        const handleSocketUpdate = () => {
+            console.log("Socket Triggered. isFinal:", isFinalRef.current);
+            axios.get(`/load-leaderboard/${isFinalRef.current}`).then((res) => {
+                setLeaderboards(res.data);
+            });
+        };
+
+        socket.on("chat message", handleSocketUpdate);
+        return () => socket.off("chat message", handleSocketUpdate);
     }, []);
 
     const loadLeaderBoards = () => {
+        console.log("loadLeaderBoards:", isFinal);
         axios.get(`/load-leaderboard/${isFinal}`).then((res) => {
             setLeaderboards(res.data);
         });
@@ -51,7 +61,7 @@ const Leaderboard = () => {
                         itemValue="value"
                         itemName="label"
                         name="stage"
-                        defaultValue={stages.find(dif => Number(dif.value) === Number(isFinal))?.label || "Unknown Stage"}
+                        value={isFinal}
                         onChange={handleStageChange}
                     />
                 </div>

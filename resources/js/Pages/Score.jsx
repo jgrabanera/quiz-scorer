@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import { io } from "socket.io-client";
 import ApplicationLogo from "@/Components/ApplicationLogo";
 import { Link } from "@inertiajs/react";
-const socket = io("http://10.10.141.122:3001");
+const socket = io("http://192.168.2.145:3001");
 
 const score = () => {
     const [students, setStudents] = useState([]);
@@ -41,16 +41,16 @@ const score = () => {
     const [mySocketId, setMySocketId] = useState(null);
 
     useEffect(() => {
+        loadEvents();
         socket.on("connect", () => {
             setMySocketId(socket.id);
         });
-
         return () => socket.off("connect");
     }, []);
 
     useEffect(() => {
         socket.on("chat message", (data) => {
-            if (data.number === qNumber && data.senderId !== mySocketId && data.stage === isFinal) {
+            if (Number(data.number) === Number(qNumber) && data.senderId !== mySocketId && Number(data.stage) === Number(isFinal)) {
                 setCheckedStudents(prev =>
                     data.status === 'Inserted'
                         ? [...prev, data.name]
@@ -58,15 +58,13 @@ const score = () => {
                 );
             }
         });
-
         return () => socket.off("chat message");
-    }, [qNumber, mySocketId]);
+    }, [qNumber, mySocketId,isFinal ]);
 
 
 
     useEffect(() => {
         loadStudents();
-        loadEvents();
     }, [isFinal]);
 
     useEffect(() => {
@@ -136,13 +134,17 @@ const score = () => {
 
 
     const handleStageChange = (e) => {
+        const value = parseInt(e.target.value);
         const formData = new FormData();
-        formData.append('stage', e.target.value)
+        formData.append('stage', value);
+
+        setIsFinal(value);
+
         axios.post('/update-stage', formData).then(
             res => {
-                setIsFinal(e.target.value)
                 resetItems()
                 setqNumber(1)
+                console.log(e.target.value, 'heruhejr')
             }
         ).catch((error) => {
             alert("❌ Error: Failed to update stage.");
