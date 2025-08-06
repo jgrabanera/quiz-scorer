@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import { io } from "socket.io-client";
 import ApplicationLogo from "@/Components/ApplicationLogo";
 import { Link } from "@inertiajs/react";
-const socket = io("http://10.10.141.77:3001");
+const socket = io("http://10.10.141.122:3001");
 
 const score = () => {
     const [students, setStudents] = useState([]);
@@ -107,14 +107,33 @@ const score = () => {
     }
 
     const handleDifficultyChange = (e) => {
-        const formData = new FormData();
-        formData.append('level', e.target.value)
-        axios.post('/update-difficulty', formData).then(
-            setLevel(e.target.value)
-        ).catch((error) => {
-            alert("❌ Error: Failed to update difficulty.");
-        });
+        const current_level = parseInt(e.target.value, 10)
+
+        setLevel(current_level)
+        if (isFinal === 0) {
+            if (current_level === 1) {
+                setqNumber(1)
+            }
+            else if (current_level === 3) {
+                setqNumber(11)
+            }
+            else if (current_level === 5) {
+                setqNumber(21)
+            }
+        }
+        else {
+            if (current_level === 1) {
+                setqNumber(1)
+            }
+            else if (current_level === 3) {
+                setqNumber(6)
+            }
+            else if (current_level === 5) {
+                setqNumber(11)
+            }
+        }
     }
+
 
     const handleStageChange = (e) => {
         const formData = new FormData();
@@ -163,15 +182,8 @@ const score = () => {
     }
 
     const navigateQuestion = (actions) => {
-        const number = actions === 1 ? qNumber + 1 : qNumber - 1;
-        const formData = new FormData();
-        formData.append('actions', actions)
-        axios.post('/navigate-questions', formData).then(
-            res => {
-                setqNumber(number)
-            }
-        )
-
+        const number = actions === 1 ? Number(qNumber) + 1 : Number(qNumber) - 1;
+        setqNumber(number)
         if (isFinal == 0) {
             if (number <= 10) {
                 setLevel(1)
@@ -194,19 +206,35 @@ const score = () => {
                 setLevel(5)
             }
         }
-
-
-
     }
 
     const jumpTo = (e) => {
-        const value = e.target.value;
+        const value = parseInt(e.target.value);
         clearTimeout(debounceRef.current);
         debounceRef.current = setTimeout(() => {
-            axios.get('/jump-to/' + value)
-                .then(() => {
-                    setqNumber(value)
-                });
+            setqNumber(value)
+            if (isFinal == 0) {
+                if (number <= 10) {
+                    setLevel(1)
+                }
+                else if (number > 10 && number <= 20) {
+                    setLevel(3)
+                }
+                else if (number > 20) {
+                    setLevel(5)
+                }
+            }
+            else {
+                if (number <= 5) {
+                    setLevel(1)
+                }
+                else if (number > 5 && number <= 10) {
+                    setLevel(3)
+                }
+                else if (number > 10) {
+                    setLevel(5)
+                }
+            }
         }, 2000);
     };
 

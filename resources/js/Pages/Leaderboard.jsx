@@ -5,18 +5,8 @@ import { io } from "socket.io-client";
 import ApplicationLogo from "@/Components/ApplicationLogo";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "@inertiajs/react";
-const socket = io("http://10.10.141.77:3001");
+const socket = io("http://10.10.141.122:3001");
 
-const getRankIcon = (index) => {
-    switch (index) {
-        case 0: return <FaMedal className="text-yellow-400" title="Gold" />;
-        case 1: return <FaMedal className="text-gray-400" title="Silver" />;
-        case 2: return <FaMedal className="text-amber-600" title="Bronze" />;
-        case 3:
-        case 4: return <FaStar className="text-indigo-400" title="Top 5" />;
-        default: return null;
-    }
-};
 
 const Leaderboard = () => {
     const [leaderboards, setLeaderboards] = useState([]);
@@ -26,7 +16,9 @@ const Leaderboard = () => {
         { value: 1, label: "Finals" },
     ];
 
-    useEffect(() => { loadLeaderBoards(); }, [isFinal]);
+    useEffect(() => {
+        loadLeaderBoards();
+    },[isFinal]);
 
     useEffect(() => {
         socket.on("chat message", loadLeaderBoards);
@@ -40,12 +32,13 @@ const Leaderboard = () => {
     };
 
     const handleStageChange = (e) => {
-        setIsFinal(e.target.value);
+        const final = parseInt(e.target.value)
+        setIsFinal(final);
     };
 
     return (
-        <div className="w-full bg-blue-200 min-h-screen">
-            <div className="max-w-7xl mx-auto px-4 py-2 ">
+        <div className="w-full bg-blue-200 min-h-screen px-10">
+            <div className="w-full mx-auto px-4 py-2 ">
                 <div className="flex justify-between gap-3">
                     <Link href="/dashboard">
                         <div className="bg-blue-500 rounded-lg shadow-md px-4 py-2 w-fit text-white font-bold">
@@ -95,20 +88,20 @@ const Leaderboard = () => {
                                     `}
                                     >
                                         <td className="px-6 py-4 font-semibold text-gray-800 ">
-                                            <div className="flex items-center gap-2 justify-center">
+                                            <div className="flex items-center gap-2 justify-center text-xl">
                                                 #{user.id}
                                             </div>
                                         </td>
                                         <td className="px-6 py-4 text-gray-700">
                                             <div className="flex items-center gap-3">
                                                 <FaUserAlt className="text-white bg-gray-400 w-6 h-6 rounded-full p-1" />
-                                                <span className=" text-sm truncate font-extrabold">{user.name}</span>
+                                                <span className=" text-lg truncate font-extrabold">{user.name}</span>
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4 text-center    text-md">
+                                        <td className="px-6 py-4 text-center    text-base font-semibold">
                                             {user.school}
                                         </td>
-                                        <td className="px-6 py-4 text-center text-blue-600 font-extrabold text-lg">
+                                        <td className="px-6 py-4 text-center text-blue-600 font-extrabold text-xl">
                                             {user.total_score}
                                         </td>
                                     </motion.tr>

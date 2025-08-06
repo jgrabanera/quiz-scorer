@@ -3,7 +3,7 @@ const express = require("express");
 const http = require("http");
 const { Server } = require("socket.io");
 const cors = require("cors");
-const HOST = "10.10.141.77"; 
+const HOST = "10.10.141.122"; 
 const PORT = 3001;
 
 const app = express();
